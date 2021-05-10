@@ -1,0 +1,140 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+.grid {
+  display: table;
+  border: 2px solid white;
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+}
+.row {
+  display: table-row
+}
+.cell {
+  font-size: 20px;
+  width: 150px;
+  height: 80px;
+  background: khaki;
+  display: table-cell;
+  border: 2px solid white;
+
+  text-align: center;
+  vertical-align: middle;
+  color: green;
+  font-weight: bold;
+
+  }
+
+.up{
+  background-color: orange;
+  font-size: 20px;
+  width: 150px;
+  height: 30px;
+  border:2px solid white;
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+}
+.le{
+  background-color: orange;
+  font-size: 20px;
+  width: 30px;
+  height: 80px;
+  border:2px solid white;
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+}
+
+#map {
+  position: absolute;
+  left:1px;
+  right: 5px;
+  top: 0px;
+  bottom: 0;
+} 
+
+.button1{
+
+  color:White;
+  background-color:blue;
+  padding:8px;
+  font-family:Open Sans, sans-serif;
+  font-size:21px;
+  display: inline-block;
+  cursor: pointer;
+  border: none;
+  border-radius: 0px;
+  cursor: pointer;
+  transition: all 0.5s;
+  box-shadow: 0 9px #999;
+}
+
+.button1 span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.button1 span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.button1:hover span {
+  padding-right: 25px;
+}
+
+.button1:hover span:after {
+  opacity: 1;
+  right: 0;
+}
+.button1:hover {background-color: #141488;}
+
+.button1:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+ 
+.card {
+  display: inline-block;
+  font-size: small;
+  border-bottom: solid #D3D3D3 2px;
+  margin-bottom: 6px;
+  width: 100%;
+
+}
+    
+.card-header {
+  font-weight: bold;
+  padding: 6px;
+  font-weight: bold;
+}
+
+.no-route {
+  background-color: #D3D3D3;
+  color: #ff0000;
+      
+}
+
+.obstacle-found {
+  background-color: #D3D3D3;
+  color: #FFFFFF;
+}
+
+.route-found {
+  background-color: #33A532;
+  color: #FFFFFF;
+}
+    
+.card-details {
+  padding: 3px 6px;
+}
