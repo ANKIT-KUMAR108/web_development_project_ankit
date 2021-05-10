@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Time matrix</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <!-- Import Mapbox GL JS -->
+  <script src=https://api.tiles.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js></script>
+  <link href=https://api.tiles.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css rel="stylesheet" />
+  
+  <!-- Import Turf and Polyline -->
+  <script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
+  <script src=https://cdnjs.cloudflare.com/ajax/libs/mapbox-polyline/1.1.1/polyline.js></script>
+  
+  <!-- Import Mapbox GL Directions -->
+  <script src=https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.0.2/mapbox-gl-directions.js></script>
+  <link rel="stylesheet" href=https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.0.2/mapbox-gl-directions.css type="text/css" />
+
+  <link rel="stylesheet" href="matrix.css">
+
+</head>
+
+<body>
+  
+  <div id="map"></div>
+  <div class="sidebar">
+    <h1>Reports</h1>
+    <div id="reports"></div>
+  </div>
+ 
+  <script>
+     var abtime=0;
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYW5raXQta3VtYXIwMDkiLCJhIjoiY2tsNThjMG5kMGxwYTJ1bjFjdzI4cWRoZSJ9.qKLRNt7Y1diM8b89i96Lzg';
+    var map = new mapboxgl.Map({
+      container: "map", // Specify the container ID
+      style: 'mapbox://styles/ankit-kumar009/ckleuuofz307r17mepjv2g25h/draft',// Specify which map style to use
+      center: [82.9913,  25.2677],  // Specify the starting position [lng, lat]
+      zoom: 10 // Specify the starting zoom
+    });
+    
+    var directions = new MapboxDirections({
+      accessToken: mapboxgl.accessToken,
+      unit: "metric",
+      profile: "mapbox/driving", //profile
+      alternatives: false, 
+      geometries: "geojson",
+      controls: { instructions: false },
+      flyTo: false
+    });
+
+    map.addControl(directions, "top-right");
+    map.scrollZoom.enable();
+    
+    var clearances = {
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              geometry: {
+              type: "Point",
+              coordinates: [-84.47426, 38.06673],
+              },
+              properties: {
+                clearance: "13' 2",
+              },
+            },
+          ]
+    };
+    
+    var obstacle = turf.buffer(clearances, 0.25, { units: "kilometers" });
+    var bbox = [0, 0, 0, 0];
+    var polygon = turf.bboxPolygon(bbox);
+    
+    map.on("load", function () {
+
+      
+    map.addSource("theRoute", {
+      type: "geojson",
+      data: {
+       type: "Feature",
+      },
+    });
+
+
+     // Source and layer for the bounding box
+     map.addSource("theBox", {
+       type: "geojson",
+       data: {
+         type: "Feature"
+       }
+     });
+
+    });
+    
+    var counter = 0;
+    var maxAttempts = 50;
+    var emoji = '';
+    var collision = '';
+    
+    
+    
+    directions.on("route", function(e) {
+      var routes = e.route;
+
+      // Hide the route and box by setting the opacity to zero
+      map.setLayoutProperty("theRoute", "visibility", "none");
+      map.setLayoutProperty("theBox", "visibility", "none");
+
+
+        // Make each route visible
+        routes.forEach(e => {
+          // Make each route visible
+          map.setLayoutProperty("theRoute", "visibility", "visible");
+          map.setLayoutProperty("theBox", "visibility", "visible");
+
+          // Get GeoJson LineString feature of route
+          var routeLine = polyline.toGeoJSON(e.geometry);
+          var intersects = turf.lineIntersect(obstacle, routeLine);
+
+          // Create a bounding box around this route
+          // The app will find a random point in the new bbox
+          bbox = turf.bbox(routeLine);
+          polygon = turf.bboxPolygon(bbox);
+          
+          // Update the data for the route
+          // This will update the route line on the map
+          map.getSource("theRoute").setData(routeLine);
+          
+          // Update the box
+          map.getSource("theBox").setData(polygon);
+          
+          var clear = turf.booleanDisjoint(obstacle, routeLine);
+            document.getElementById("AB").innerHTML ="This takes "+(e.duration / 60).toFixed(0)+" Minutes";
+            document.getElementById("BA").innerHTML ="This takes "+(e.duration / 60).toFixed(0)+" Minutes";
+            document.getElementById("AA").innerHTML ="This takes "+0+" Minutes";
+            document.getElementById("BB").innerHTML ="This takes "+0+" Minutes";
+ 
+        })
+    });
+  </script>
+<a href="front_page.html" class="button1" style="position:absolute; bottom:20px; right:30px;text-decoration: none;"> BACK TO HOME PAGE </a>
+
+<div class="grid">
+  <div class="row">
+    <div class="up" style="height: 30px;width: 30px;"></div>
+    <div class="up">A</div>
+    <div class="up">B</div>
+  </div>
+  <div class="row">
+    <div class="le">A</div>
+    <div class="cell" id="AA"><span style="color: grey;font-size: 20px;">Time it takes to reach A from A</span></div>
+    <div class="cell" id="BA"><span style="color: grey;font-size: 20px;">Time it takes to reach B from A</span></div>
+  </div>
+  <div class="row">
+    <div class="le">B</div>
+    <div class="cell" id="AB"><span style="color: grey;font-size: 20px;">Time it takes to reach B from A</span></div>
+    <div class="cell" id="BB"><span style="color: grey;font-size: 20px;">Time it takes to reach B from B</span></div>
+  </div>
+</div>
+
+</body>
+</html>
